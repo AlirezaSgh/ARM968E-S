@@ -9,7 +9,7 @@ module Instruction_Memory
             $readmemb("inst.txt", instructions);
         end
     
-        assign inst_out = { instructions[inst_out], instructions[inst_out + 1],
-                            instructions[inst_out+2], instructions[inst_out+3]};
+        assign inst_out = { instructions[pc_in], instructions[pc_in + 1],
+                            instructions[pc_in+2], instructions[pc_in+3]};
 
 endmodule
