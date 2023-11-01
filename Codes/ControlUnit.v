@@ -49,33 +49,39 @@ module ControlUnit(
     end
 
     always @(operation) begin
+        EXE_CMD = 4'd0;
+        WB_EN = 0;
+        MEM_R_EN = 0;
+        MEM_W_EN = 0;
+        B_out = 0;
+        S_out = 0;
         case(operation)
             NOP: begin
-                EXE_CMD = 0110;
+                EXE_CMD = 4'b0110;
             end
             MOV: begin
-                EXE_CMD = 0001;
+                EXE_CMD = 4'b0001;
             end
             MVN: begin
-                EXE_CMD = 1001;
+                EXE_CMD = 4'b1001;
             end
             ADD: begin
-                EXE_CMD = 0010;
+                EXE_CMD = 4'b0010;
             end
             ADC: begin
-                EXE_CMD = 0011;
+                EXE_CMD = 4'b0011;
             end
             SUB: begin
-                EXE_CMD = 0100;
+                EXE_CMD = 4'b0100;
             end
             SBC: begin
-                EXE_CMD = 0101;
+                EXE_CMD = 4'b0101;
             end
             AND: begin
-                EXE_CMD = 0110;
+                EXE_CMD = 4'b0110;
             end
             ORR: begin
-                EXE_CMD = 0111;
+                EXE_CMD = 4'b0111;
             end
             EOR: begin
                 EXE_CMD = 1000;

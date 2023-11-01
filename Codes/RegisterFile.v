@@ -6,26 +6,26 @@ module RegisterFile (
     output [31:0] reg1,reg2
 );
 
-    reg[15:0] reg_file [31:0];
+    reg[31:0] reg_file [15:0];
     integer i;
 
     initial begin
         for(i = 0; i < 16; i = i + 1)
-            reg_file[i] <= i;
+            shit[i] <= i;
     end
 
     always @(negedge clk) begin
         if(rst) begin
             for(i = 0; i < 16; i = i+1) begin
-                reg_file[i] <= i;
+                shit[i] <= i;
             end
         end
         else if(writeBackEn) begin
-            reg_file[Dest_wb] <= Result_WB;
+            shit[Dest_wb] <= Result_WB;
         end
     end
 
-    assign reg1 = reg_file[src1];
-    assign reg2 = reg_file[src2];
+    assign reg1 = shit[src1];
+    assign reg2 = shit[src2];
 
 endmodule

@@ -9,7 +9,7 @@ parameter [3:0] EQ = 4'd0, NE = 4'd1, CS_HS = 4'd2, CC_LO = 4'd3, MI = 4'd4,
                 PL = 4'd5, VS = 4'd6, VC = 4'd7, HI = 4'd8, LS = 4'd9, 
                 GE = 4'd10, LT = 4'd11, GT = 4'd12, LE = 4'd13, AL = 4'd14;
 always @(cond, OPCode) begin
-    flag = 0;
+    flag = 1;
     case (OPCode)
         EQ : flag = Z;
         NE : flag = ~Z;
@@ -26,7 +26,7 @@ always @(cond, OPCode) begin
         GT : flag = (~Z) & (N == V);
         LE : flag = Z | (N != V);
         AL : flag = 1;
-        default: flag = 0;
+        default: flag = 1;
     endcase
 end
 endmodule

@@ -27,7 +27,7 @@ module ID_Stage(
     wire [1:0] OPC_mode;
     wire OPC_S, CU_B, CU_S, CU_WB_EN, CU_MEM_R_EN, CU_MEM_W_EN, cond_flag, zero_sel, not_cond_flag;
     assign cond = Instruction[31:28];
-    assign mode = Instruction[27:26];
+    assign OPC_mode = Instruction[27:26];
     assign imm = Instruction[25];
     assign OPCode = Instruction[24:21];
     assign OPC_S = Instruction[20];
@@ -41,5 +41,5 @@ module ID_Stage(
     MUX #9 cond_mux({CU_EXE_CMD, CU_WB_EN, CU_MEM_R_EN, CU_MEM_W_EN, CU_B, CU_S}, 9'b0, zero_sel,{EXE_CMD, WB_EN, MEM_R_EN, MEM_W_EN, B, S});
     Condition_Check condition_check(cond, OPCode,cond_flag);
     RegisterFile register_file(clk, rst, Rn, , Des_wb, Result_WB, writeBackEN, Val_Rn, Val_Rm);
-    ControlUnit control_unit(OPCode, mode, OPC_S, imm, CU_EXE_CMD, CU_WB_EN, CU_MEM_R_EN, CU_MEM_W_EN, CU_B, CU_S);
+    ControlUnit control_unit(OPCode, OPC_mode, OPC_S, imm, CU_EXE_CMD, CU_WB_EN, CU_MEM_R_EN, CU_MEM_W_EN, CU_B, CU_S);
 endmodule
