@@ -6,10 +6,10 @@ module ControlUnit(
     output reg WB_EN, MEM_R_EN, MEM_W_EN, B_out, S_out
 );
     // Operations
-    parameter [3:0] NOP = 4'd0, MOV = 4'd1, MVN = 4'd2, ADD = 4'd3, ADC = 4'd4, SUB = 4'd5, SBC = 4'6,
+    parameter [3:0] NOP = 4'd0, MOV = 4'd1, MVN = 4'd2, ADD = 4'd3, ADC = 4'd4, SUB = 4'd5, SBC = 4'd6,
                     AND = 4'd7, ORR = 4'd8, EOR = 4'd9, CMP = 4'd10, TST = 4'd11, LDR = 4'd12, STR = 4'd13, B = 4'd14;
 
-    wire [3:0] operation;
+    reg [3:0] operation;
     always@(Mode, OP_Code) begin
         case(Mode)
             2'b00: begin
@@ -63,7 +63,7 @@ module ControlUnit(
                 EXE_CMD = 0010;
             end
             ADC: begin
-                EXE_CMD = 0011
+                EXE_CMD = 0011;
             end
             SUB: begin
                 EXE_CMD = 0100;
@@ -81,13 +81,13 @@ module ControlUnit(
                 EXE_CMD = 1000;
             end
             CMP: begin
-                EXE_CMD = 0100
+                EXE_CMD = 0100;
             end
             TST: begin
                 EXE_CMD = 0110;
             end
             LDR: begin
-                EXE_CMD = 0010
+                EXE_CMD = 0010;
             end
             STR: begin
                 EXE_CMD = 0010;
