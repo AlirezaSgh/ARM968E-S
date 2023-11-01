@@ -301,9 +301,15 @@ input          TD_CLK27;            //	TV Decoder 27MHz CLK
 ////////////////////////	GPIO	////////////////////////////////
 inout	[35:0]	GPIO_0;					//	GPIO Connection 0
 inout	[35:0]	GPIO_1;					//	GPIO Connection 1
-wire [31:0] w1, w2;
-assign LEDG[0] = CLOCK_50;
-IF_Stage (CLOCK_50, SW[0], SW[1], SW[2], 32'b0, w1, w2);
-assign LEDR[0] = w1[5];
-assign LEDR[1] = w2[10];	
+wire rst, writeBackEN, hazard, WB_EN, MEM_R_EN, MEM_W_EN, B, S, imm, Two_src;
+assign rst = ~ KEY[0];
+wire [31:0] PC_in, Inst_in, Result_WB, Val_Rn, Val_Rm;
+wire [3:0] Des_wb, SR, EXE_CMD, Dest, src1, src2;
+wire [23:0] Signed_imm_24;
+wire [11:0] Shift_operand;
+IF_Stage fetch(CLOCK_50, rst, 1'b0, 1'b0, 32'b0, PC_in, Inst_in);
+IF_Stage_Reg if_reg(clk, rst, 1'b0, 1'b0, PC_in, Inst_in, PC, Inst);
+ID_Stage decode(clk, rst, Inst, Result_WB, writeBackEN, Des_wb, hazard, 
+		SR, WB_EN, MEM_R_EN, MEM_W_EN, B, S, EXE_CMD, Val_Rn, 
+		Val_Rm, imm, Shift_operand, Signed_imm_24, Dest, src1, src2, Two_src);
 endmodule
