@@ -8,7 +8,7 @@ assign V = cond[0];
 parameter [3:0] EQ = 4'd0, NE = 4'd1, CS_HS = 4'd2, CC_LO = 4'd3, MI = 4'd4, 
                 PL = 4'd5, VS = 4'd6, VC = 4'd7, HI = 4'd8, LS = 4'd9, 
                 GE = 4'd10, LT = 4'd11, GT = 4'd12, LE = 4'd13, AL = 4'd14;
-always @(cond, OPCode) begin
+always @(cond, OPCode, N, Z, C, V) begin
     flag = 1;
     case (OPCode)
         EQ : flag = Z;

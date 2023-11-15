@@ -10,7 +10,8 @@ module ControlUnit(
                     AND = 4'd7, ORR = 4'd8, EOR = 4'd9, CMP = 4'd10, TST = 4'd11, LDR = 4'd12, STR = 4'd13, B = 4'd14;
 
     reg [3:0] operation;
-    always@(Mode, OP_Code) begin
+    always@(Mode, OP_Code, S_in, I_in) begin
+		operation=NOP;
         case(Mode)
             2'b00: begin
                 case(OP_Code)
@@ -25,6 +26,7 @@ module ControlUnit(
                     4'b0001: operation = EOR;
                     4'b1010: operation = CMP;
                     4'b1000: operation = TST;
+						  default: operation = NOP;
                 endcase
             end
             2'b01:begin
@@ -84,22 +86,22 @@ module ControlUnit(
                 EXE_CMD = 4'b0111;
             end
             EOR: begin
-                EXE_CMD = 1000;
+                EXE_CMD = 4'b1000;
             end
             CMP: begin
-                EXE_CMD = 0100;
+                EXE_CMD = 4'b0100;
             end
             TST: begin
-                EXE_CMD = 0110;
+                EXE_CMD = 4'b0110;
             end
             LDR: begin
-                EXE_CMD = 0010;
+                EXE_CMD = 4'b0010;
             end
             STR: begin
-                EXE_CMD = 0010;
+                EXE_CMD = 4'b0010;
             end
             B: begin
-                B_out = 1;
+                B_out = 1'b1;
             end
         endcase
     end

@@ -301,9 +301,70 @@ input          TD_CLK27;            //	TV Decoder 27MHz CLK
 ////////////////////////	GPIO	////////////////////////////////
 inout	[35:0]	GPIO_0;					//	GPIO Connection 0
 inout	[35:0]	GPIO_1;					//	GPIO Connection 1
-wire [31:0] w1, w2;
-assign LEDG[0] = CLOCK_50;
-IF_Stage (CLOCK_50, SW[0], SW[1], SW[2], 32'b0, w1, w2);
-assign LEDR[0] = w1[5];
-assign LEDR[1] = w2[10];	
+
+
+// wire [31:0] w1, w2;
+// assign LEDG[0] = CLOCK_50;
+// IF_Stage (CLOCK_50, SW[0], SW[1], SW[2], 32'b0, w1, w2);
+// assign LEDR[0] = w1[5];
+// assign LEDR[1] = w2[10];
+
+	wire writeBackEN_ID, hazard, WB_EN_ID_Stage,MEM_R_EN_ID_Stage, 
+		MEM_W_EN_ID_Stage,B_ID_Stage,S_ID_Stage,imm_ID_Stage, 
+		Two_src_ID_Stage, imm_ID_Reg, WB_EN_ID_Reg, MEM_W_EN_ID_Reg
+		MEM_R_EN_ID_Reg, B_ID_Reg, S_ID_Reg;
+	wire [31:0] PC_IF_Stage, Inst_IF_Stage, Inst_IF_Reg, 
+				Val_Rn_ID_Stage, Val_Rm_ID_Stage, PC_IF_Reg, 
+				EXE_CMD_ID_Reg, PC_ID_Reg, Val_Rn_ID_Reg, Val_Rm_ID_Reg; 
+	reg [31:0] Result_WB = 0; 
+	reg [3:0]Des_wb = 0; 
+	wire [3:0] EXE_CMD_ID_Stage, Dest_ID_Stage, 
+				src1_ID_Stage, src2_ID_Stage, dest_ID_Reg; 
+	wire [23:0] Signed_imm_24_ID_Stage, Signed_imm_24_ID_Reg; 
+	wire [11:0] Shift_operand, Shift_operand_out; 
+	assign LEDG[0] = EXE_CMD_ID_Stage[1];
+	assign LEDG[1] = Inst_IF_Stage[1];
+	IF_Stage fetch(CLOCK_50, SW[0], 1'b0, 1'b0, 32'b0, PC_IF_Stage, Inst_IF_Stage); 
+	IF_Stage_Reg if_reg(CLOCK_50, SW[0], 1'b0, 1'b0, PC_IF_Stage, Inst_IF_Stage, PC_IF_Reg, Inst_IF_Reg); 
+	ID_Stage decode(CLOCK_50, SW[0], Inst_IF_Reg, Result_WB, writeBackEN_ID, Des_wb, hazard,  
+					SR, WB_EN_ID_Stage, MEM_R_EN_ID_Stage, MEM_W_EN_ID_Reg, B_ID_Stage,
+					S_ID_Stage, EXE_CMD_ID_Stage, Val_Rn_ID_Stage,  
+					Val_Rm_ID_Stage, imm_ID_Stage, Shift_operand, Signed_imm_24_ID_Stage,
+					Dest_ID_Stage, src1_ID_Stage, src2_ID_Stage, Two_src_ID_Stage); 
+	ID_Stage_Reg id_reg(CLOCK_50, SW[0], 1'b0, WB_EN_ID_Stage, MEM_R_EN_ID_Stage,
+						MEM_W_EN_ID_Reg, B_ID_Stage, S_ID_Stage,
+						EXE_CMD_ID_Stage, PC_IF_Reg, Val_Rn_ID_Stage, Val_Rm_ID_Stage,
+						imm_ID_Stage, Shift_operand, Signed_imm_24_ID_Stage, Dest_ID_Stage,
+						WB_EN_out, MEM_R_EN_ID_Reg, MEM_W_EN_ID_Reg, B_ID_Reg, S_ID_Reg,
+						EXE_CMD_ID_Reg, PC_ID_Reg, Val_Rn_ID_Reg, Val_Rm_ID_Reg, imm_ID_Reg,
+						Shift_operand_out, Signed_imm_24_ID_Reg, dest_ID_Reg);
+	wire [3:0]SR, Status_bit;
+	register Status_Register#4(CLOCK_50, SW[0], S_ID_Reg, Status_bit, SR);
+	wire [31:0] ALU_result_EXE_Stage, Br_addr;
+	wire [3:0] status;
+	EXE_Stage execute(
+	CLOCK_50,
+	EXE_CMD_ID_Reg,
+	MEM_R_EN_ID_Reg, MEM_W_EN_ID_Reg, 
+	PC_ID_Reg, Val_Rn_ID_Reg, Val_Rm_ID_Reg,
+	imm_ID_Reg,
+	Shift_operand_out,
+	Signed_imm_24_ID_Reg,
+	SR, 
+	ALU_result_EXE_Stage, Br_addr,
+	Status_bit
+	);
+
+	wire [31:0] ALU_result_EXE_Reg, Val_Rm_EXE_Reg;
+	wire [3:0] dest_EXE_Reg;
+	wire WB_EN_EXE_Reg, MEM_R_EN_EXE_Reg, MEM_W_EN_EXE_Reg;
+	EXE_Stage_Reg EX_Reg(
+	CLOCK_50, SW[0], WB_EN_ID_Reg, MEM_R_EN_ID_Reg, MEM_W_EN_ID_Reg, 
+	ALU_result_EXE_Stage, Val_Rm_ID_Reg,
+	dest_ID_Reg,
+	WB_EN_EXE_Reg, MEM_R_EN_EXE_Reg, MEM_W_EN_EXE_Reg, 
+	ALU_result_EXE_Reg, Val_Rm_EXE_Reg,
+	dest_EXE_Reg
+	);
+
 endmodule

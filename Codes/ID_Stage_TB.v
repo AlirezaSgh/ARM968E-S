@@ -3,7 +3,7 @@ wire WB_EN, MEM_R_EN, MEM_W_EN, B, S, imm, Two_src;
 reg writeBackEN = 0, hazard = 0; 
  
 reg rst = 1, CLOCK_50 = 0; 
-wire [31:0] PC_in, Inst_in, Inst, Val_Rn, Val_Rm; 
+wire [31:0] PC_in, Inst_in, Inst, Val_Rn, Val_Rm, PC; 
 reg [31:0] Result_WB = 0; 
 reg [3:0] SR = 0,Des_wb = 0; 
 wire [3:0] EXE_CMD, Dest, src1, src2; 
