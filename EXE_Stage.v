@@ -11,4 +11,13 @@ module EXE_Stage(
 	output [3:0] status
 );
 
+	wire bypass_rm;
+	wire [31:0] val2, extended_imm, shifted_imm;
+	assign extended_imm = {8{Signed_imm_24[23]}, Signed_imm_24};
+	assign shifted_imm = extended_imm << 2;
+	assign bypass_rm = MEM_W_EN | MEM_R_EN;
+	Val2Generator v2gen(imm, bypass_rm, Val_Rm, Shift_operand, val2);
+	ALU alu(Val_Rn, val2, EXE_CMD, SR[1], status, ALU_result);
+	Adder pc_adder(PC, shifted_imm, Br_addr);
+
 endmodule
