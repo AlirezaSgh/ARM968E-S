@@ -102,7 +102,6 @@ module ControlUnit (
       end
       CMP: begin
         EXE_CMD = 4'b0100;
-        WB_EN   = 1'b1;
       end
       TST: begin
         EXE_CMD = 4'b0110;
