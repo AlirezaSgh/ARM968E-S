@@ -14,6 +14,7 @@ module Condition_Check (
                 GE = 4'd10, LT = 4'd11, GT = 4'd12, LE = 4'd13, AL = 4'd14;
   always @(cond, OPCode, N, Z, C, V) begin
     flag = 1;
+      if(cond != 4'b1110 & cond != 4'b1111)
     case (OPCode)
       EQ: flag = Z;
       NE: flag = ~Z;
