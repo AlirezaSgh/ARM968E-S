@@ -1,18 +1,18 @@
 module Condition_Check (
     input [3:0] cond,
-    OPCode,
+    SR,
     output reg flag
 );
   //cond = NZCV
   wire N, Z, C, V;
-  assign N = OPCode[3];
-  assign Z = OPCode[2];
-  assign C = OPCode[1];
-  assign V = OPCode[0];
+  assign N = SR[3];
+  assign Z = SR[2];
+  assign C = SR[1];
+  assign V = SR[0];
   parameter [3:0] EQ = 4'd0, NE = 4'd1, CS_HS = 4'd2, CC_LO = 4'd3, MI = 4'd4, 
                 PL = 4'd5, VS = 4'd6, VC = 4'd7, HI = 4'd8, LS = 4'd9, 
                 GE = 4'd10, LT = 4'd11, GT = 4'd12, LE = 4'd13, AL = 4'd14;
-  always @(cond, OPCode, N, Z, C, V) begin
+  always @(cond, SR, N, Z, C, V) begin
     flag = 1;
     case (cond)
       EQ: flag = Z;
