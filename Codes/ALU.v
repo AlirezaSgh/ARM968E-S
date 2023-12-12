@@ -8,8 +8,8 @@ module ALU (
 );
   parameter [3:0] MOV = 4'b001, MVN = 4'b1001, ADD_LDR_STR = 4'b0010, ADC = 4'b0011, SUB_CMP = 4'b0100, SBC = 4'b0101,
                     AND_TST = 4'b0110, ORR = 4'b0111, EOR = 4'b1000, TST = 4'b0110;
-  //n neg out
-  //v overflow
+  //N neg out
+  //V overflow
   //C carry out
   //Z zero
   reg N, Z, Co, V;

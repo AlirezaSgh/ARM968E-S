@@ -84,7 +84,7 @@ module Instruction_Memory (
 
   end
 
-assign inst_out = (pc_in > 187) ? 32'b11100000000000000000000000000000 : {
+  assign inst_out = (pc_in > 187) ? 32'b11100000000000000000000000000000 : {
     instructions[pc_in], instructions[pc_in+1], instructions[pc_in+2], instructions[pc_in+3]
   };
 

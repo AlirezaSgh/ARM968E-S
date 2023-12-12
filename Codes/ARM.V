@@ -317,7 +317,7 @@ module ARM (
 				Val_Rn_ID_Stage, Val_Rm_ID_Stage, PC_IF_Reg, 
 				EXE_CMD_ID_Reg, PC_ID_Reg, Val_Rn_ID_Reg, Val_Rm_ID_Reg;
   wire [31:0] Result_WB;
-  wire [3:0] Des_wb;
+  wire [ 3:0] Des_wb;
   wire [3:0] EXE_CMD_ID_Stage, Dest_ID_Stage, src1_ID_Stage, src2_ID_Stage, dest_ID_Reg;
   wire [23:0] Signed_imm_24_ID_Stage, Signed_imm_24_ID_Reg;
   wire [11:0] Shift_operand, Shift_operand_ID_Reg;
@@ -325,7 +325,7 @@ module ARM (
   assign LEDG[0] = EXE_CMD_ID_Stage[1];
   assign LEDG[1] = Inst_IF_Stage[1];
 
-	assign hazard = freeze;
+  assign hazard  = freeze;
   assign flush   = 1'b0;
   IF_Stage fetch (
       CLOCK_50,

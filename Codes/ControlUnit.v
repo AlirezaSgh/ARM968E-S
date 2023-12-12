@@ -112,7 +112,7 @@ module ControlUnit (
         WB_EN = 1'b1;
       end
       STR: begin
-        EXE_CMD = 4'b0010;
+        EXE_CMD  = 4'b0010;
         MEM_W_EN = 1'b1;
       end
       B: begin
