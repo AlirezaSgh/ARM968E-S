@@ -65,7 +65,7 @@ module ID_Stage (
   );
   Condition_Check condition_check (
       cond,
-      OPCode,
+      SR,
       cond_flag
   );
   RegisterFile register_file (
