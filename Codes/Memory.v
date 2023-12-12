@@ -12,7 +12,7 @@ module Memory (
     for (i = 0; i < 64; i = i + 1) mem_reg[i] = i;
   end
   wire [31:0] calculated_address;
-  assign calculated_address = address >= 1024 ? (address - 1024) >> 2:0;
+  assign calculated_address = (address >= 1024) ? ((address - 1024) >> 2):0;
   assign MEM_result = MEMread ? mem_reg[calculated_address] : 0;
   always @(posedge clk) begin
     if (MEMwrite) begin
