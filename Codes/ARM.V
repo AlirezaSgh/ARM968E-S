@@ -322,6 +322,11 @@ module ARM (
   wire [23:0] Signed_imm_24_ID_Stage, Signed_imm_24_ID_Reg;
   wire [11:0] Shift_operand, Shift_operand_ID_Reg;
   wire [3:0] SR, Status_bit;
+  wire [31:0] ALU_result_EXE_Reg, Val_Rm_EXE_Reg;
+  wire [3:0] dest_EXE_Reg;
+  wire WB_EN_EXE_Reg, MEM_R_EN_EXE_Reg, MEM_W_EN_EXE_Reg;
+  wire [31:0] ALU_result_EXE_Stage, Br_addr;
+  wire [3:0] status;
   assign LEDG[0] = EXE_CMD_ID_Stage[1];
   assign LEDG[1] = Inst_IF_Stage[1];
 
@@ -331,8 +336,8 @@ module ARM (
       CLOCK_50,
       SW[0],
       freeze,
-      1'b0,
-      32'b0,
+      B_ID_Reg,
+      Br_addr,
       PC_IF_Stage,
       Inst_IF_Stage
   );
@@ -409,8 +414,6 @@ module ARM (
       Status_bit,
       SR
   );
-  wire [31:0] ALU_result_EXE_Stage, Br_addr;
-  wire [3:0] status;
   EXE_Stage execute (
       CLOCK_50,
       EXE_CMD_ID_Reg,
@@ -427,10 +430,6 @@ module ARM (
       Br_addr,
       Status_bit
   );
-
-  wire [31:0] ALU_result_EXE_Reg, Val_Rm_EXE_Reg;
-  wire [3:0] dest_EXE_Reg;
-  wire WB_EN_EXE_Reg, MEM_R_EN_EXE_Reg, MEM_W_EN_EXE_Reg;
   EXE_Stage_Reg EX_Reg (
       CLOCK_50,
       SW[0],
