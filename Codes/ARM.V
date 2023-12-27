@@ -315,25 +315,36 @@ module ARM (
 		MEM_R_EN_ID_Reg, B_ID_Reg, S_ID_Reg;
   wire [31:0] PC_IF_Stage, Inst_IF_Stage, Inst_IF_Reg, 
 				Val_Rn_ID_Stage, Val_Rm_ID_Stage, PC_IF_Reg, 
-				EXE_CMD_ID_Reg, PC_ID_Reg, Val_Rn_ID_Reg, Val_Rm_ID_Reg;
-  wire [31:0] Result_WB;
-  wire [ 3:0] Des_wb;
-  wire [3:0] EXE_CMD_ID_Stage, Dest_ID_Stage, src1_ID_Stage, src2_ID_Stage, dest_ID_Reg;
+			    PC_ID_Reg, Val_Rn_ID_Reg, Val_Rm_ID_Reg;
+  wire [31:0] Result_WB, Mem_res_feedback;
+  wire [3:0] Des_wb;
+  wire [3:0] EXE_CMD_ID_Stage,EXE_CMD_ID_Reg, Dest_ID_Stage, src1_ID_Stage, src2_ID_Stage, dest_ID_Reg;
   wire [23:0] Signed_imm_24_ID_Stage, Signed_imm_24_ID_Reg;
   wire [11:0] Shift_operand, Shift_operand_ID_Reg;
   wire [3:0] SR, Status_bit;
   wire [31:0] ALU_result_EXE_Reg, Val_Rm_EXE_Reg;
-  wire [3:0] dest_EXE_Reg;
-  wire WB_EN_EXE_Reg, MEM_R_EN_EXE_Reg, MEM_W_EN_EXE_Reg;
-  wire [31:0] ALU_result_EXE_Stage, Br_addr;
-  wire [3:0] status;
+  wire [31:0] MEM_result_MEM_Stage;
+  wire [3:0] dest_EXE_Reg, src1_ID_Reg, src2_ID_Reg;
+  wire WB_EN_EXE_Reg, MEM_R_EN_EXE_Reg, MEM_W_EN_EXE_Reg, processor_mode;
+  wire [31:0] ALU_result_EXE_Stage, Br_addr, Val_Rm_EXE_Stage;
+  wire [3:0] status, SR_ID_Reg;
+  wire [1:0] fw_sel_src1, fw_sel_src2;
   assign LEDG[0] = EXE_CMD_ID_Stage[1];
   assign LEDG[1] = Inst_IF_Stage[1];
-
-  assign hazard  = freeze;
-  assign flush   = 1'b0;
-  IF_Stage fetch (
+  assign processor_mode = SW[1];
+  assign hazard = freeze;
+  assign flush = 1'b0;
+  assign Mem_res_feedback = MEM_R_EN_EXE_Reg ? MEM_result_MEM_Stage : ALU_result_EXE_Reg;
+  // assign Mem_res_feedback = ALU_result_EXE_Reg;
+  wire slow_clk;
+  //   assign slow_clk = CLOCK_50;
+  freq_div #8 fdu (
       CLOCK_50,
+      slow_clk
+  );
+
+  IF_Stage fetch (
+      slow_clk,
       SW[0],
       freeze,
       B_ID_Reg,
@@ -342,7 +353,7 @@ module ARM (
       Inst_IF_Stage
   );
   IF_Stage_Reg if_reg (
-      CLOCK_50,
+      slow_clk,
       SW[0],
       freeze,
       flush,
@@ -352,7 +363,7 @@ module ARM (
       Inst_IF_Reg
   );
   ID_Stage decode (
-      CLOCK_50,
+      slow_clk,
       SW[0],
       Inst_IF_Reg,
       Result_WB,
@@ -377,7 +388,7 @@ module ARM (
       Two_src_ID_Stage
   );
   ID_Stage_Reg id_reg (
-      CLOCK_50,
+      slow_clk,
       SW[0],
       flush,
       WB_EN_ID_Stage,
@@ -386,6 +397,7 @@ module ARM (
       B_ID_Stage,
       S_ID_Stage,
       EXE_CMD_ID_Stage,
+      SR,
       PC_IF_Reg,
       Val_Rn_ID_Stage,
       Val_Rm_ID_Stage,
@@ -393,6 +405,8 @@ module ARM (
       Shift_operand,
       Signed_imm_24_ID_Stage,
       Dest_ID_Stage,
+      src1_ID_Stage,
+      src2_ID_Stage,
       WB_EN_ID_Reg,
       MEM_R_EN_ID_Reg,
       MEM_W_EN_ID_Reg,
@@ -405,39 +419,47 @@ module ARM (
       imm_ID_Reg,
       Shift_operand_ID_Reg,
       Signed_imm_24_ID_Reg,
-      dest_ID_Reg
+      dest_ID_Reg,
+      src1_ID_Reg,
+      src2_ID_Reg,
+      SR_ID_Reg
   );
   status_reg Status_Register (
-      CLOCK_50,
+      slow_clk,
       SW[0],
       S_ID_Reg,
       Status_bit,
       SR
   );
   EXE_Stage execute (
-      CLOCK_50,
+      slow_clk,
       EXE_CMD_ID_Reg,
       MEM_R_EN_ID_Reg,
       MEM_W_EN_ID_Reg,
       PC_ID_Reg,
       Val_Rn_ID_Reg,
       Val_Rm_ID_Reg,
+      Mem_res_feedback,
+      Result_WB,
       imm_ID_Reg,
       Shift_operand_ID_Reg,
       Signed_imm_24_ID_Reg,
-      SR,
+      SR_ID_Reg,
+      fw_sel_src1,
+      fw_sel_src2,
       ALU_result_EXE_Stage,
+      Val_Rm_EXE_Stage,
       Br_addr,
       Status_bit
   );
   EXE_Stage_Reg EX_Reg (
-      CLOCK_50,
+      slow_clk,
       SW[0],
       WB_EN_ID_Reg,
       MEM_R_EN_ID_Reg,
       MEM_W_EN_ID_Reg,
       ALU_result_EXE_Stage,
-      Val_Rm_ID_Reg,
+      Val_Rm_EXE_Stage,
       dest_ID_Reg,
       WB_EN_EXE_Reg,
       MEM_R_EN_EXE_Reg,
@@ -447,10 +469,8 @@ module ARM (
       dest_EXE_Reg
   );
 
-  wire [31:0] MEM_result_MEM_Stage;
-
   Memory mem (
-      CLOCK_50,
+      slow_clk,
       MEM_R_EN_EXE_Reg,
       MEM_W_EN_EXE_Reg,
       ALU_result_EXE_Reg,
@@ -460,7 +480,7 @@ module ARM (
   wire MEM_R_en_MEM_Reg;
   wire [31:0] ALU_result_MEM_Reg, Mem_read_value_MEM_Reg;
   MEM_reg mem_reg (
-      CLOCK_50,
+      slow_clk,
       SW[0],
       WB_EN_EXE_Reg,
       MEM_R_EN_EXE_Reg,
@@ -486,8 +506,23 @@ module ARM (
       src2_ID_Stage,
       dest_ID_Reg,
       WB_EN_ID_Reg,
+      processor_mode,
       dest_EXE_Reg,
       WB_EN_EXE_Reg,
       freeze
+  );
+  assign LEDR[3] = B_ID_Reg;
+  assign LEDR[4] = Br_addr[31];
+
+  Forwarding_Unit fwu (
+      Des_wb,
+      dest_EXE_Reg,
+      src1_ID_Reg,
+      src2_ID_Reg,
+      writeBackEN_ID,
+      WB_EN_EXE_Reg,
+      processor_mode,
+      fw_sel_src1,
+      fw_sel_src2
   );
 endmodule

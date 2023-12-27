@@ -262,6 +262,7 @@ module ARM_tb ();
 
   initial begin
     SW[0] = 1;
+    SW[1] = 1;
     #20 SW[0] = 0;
   end
 endmodule

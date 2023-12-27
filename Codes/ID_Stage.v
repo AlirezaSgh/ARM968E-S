@@ -51,18 +51,21 @@ module ID_Stage (
   assign Shift_operand = Instruction[11:0];
 
 
-  MUX register_file_mux (
-      Instruction[3:0],
-      Rd,
-      MEM_W_EN,
-      Rm
-  );
-  MUX #9 cond_mux (
-      {CU_EXE_CMD, CU_WB_EN, CU_MEM_R_EN, CU_MEM_W_EN, CU_B, CU_S},
-      9'b0,
-      zero_sel,
-      {EXE_CMD, WB_EN, MEM_R_EN, MEM_W_EN, B, S}
-  );
+  //   MUX register_file_mux (
+  //       Instruction[3:0],
+  //       Rd,
+  //       MEM_W_EN,
+  //       Rm
+  //   );
+  assign Rm = MEM_W_EN ? Rd : Instruction[3:0];
+  //   MUX #9 cond_mux (
+  //       {CU_EXE_CMD, CU_WB_EN, CU_MEM_R_EN, CU_MEM_W_EN, CU_B, CU_S},
+  //       9'b0,
+  //       zero_sel,
+  //       {EXE_CMD, WB_EN, MEM_R_EN, MEM_W_EN, B, S}
+  //   );
+  assign {EXE_CMD, WB_EN, MEM_R_EN, MEM_W_EN, B, S} = zero_sel ? 9'b0: 
+         {CU_EXE_CMD, CU_WB_EN, CU_MEM_R_EN, CU_MEM_W_EN, CU_B, CU_S};
   Condition_Check condition_check (
       cond,
       SR,
